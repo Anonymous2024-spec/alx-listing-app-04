@@ -1,10 +1,12 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import PropertyCard from "@/components/common/PropertyCard";
 import Pill from "@/components/common/Pill";
-import { HERO_IMAGE, PROPERTYLISTINGSAMPLE } from "@/constants";
-
-// Booking Components
+import { HERO_IMAGE } from "@/constants";
 import BookingForm from "@/components/booking/BookingForm";
 import Cancellation from "@/components/booking/CancellationPolicy";
 import OrderSummary from "@/components/booking/OrderSummary";
+import { PropertyProps } from "@/interfaces";
 
 const filters = [
   "Top Villa",
@@ -16,6 +18,26 @@ const filters = [
 ];
 
 const Home = () => {
+  const [properties, setProperties] = useState<PropertyProps[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const response = await axios.get("/api/properties");
+        setProperties(response.data);
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+        setError("Failed to load properties.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
   return (
     <div>
       {/* Hero Section */}
@@ -46,23 +68,16 @@ const Home = () => {
       {/* Listing Section */}
       <section className="max-w-7xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold mb-4">Top Properties</h2>
+
+        {loading && <p>Loading properties...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {PROPERTYLISTINGSAMPLE.map((property, idx) => (
-            <div key={idx}>
-              <img
-                src={property.image}
-                alt={property.name}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <div className="mt-2">
-                <h3 className="text-lg font-semibold">{property.name}</h3>
-                <p className="text-sm text-gray-500">
-                  ${property.price} / night
-                </p>
-                <p className="text-sm text-yellow-500">⭐ {property.rating}</p>
-              </div>
-            </div>
-          ))}
+          {!loading &&
+            !error &&
+            properties.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))}
         </div>
       </section>
 
