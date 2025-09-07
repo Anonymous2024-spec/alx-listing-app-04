@@ -1,5 +1,5 @@
 import React from "react";
-import { PropertyProps } from "@/interfaces/PropertyProps";
+import { PropertyProps } from "@/interfaces";
 
 const PropertyCard: React.FC<{ property: PropertyProps }> = ({ property }) => {
   return (
@@ -10,7 +10,9 @@ const PropertyCard: React.FC<{ property: PropertyProps }> = ({ property }) => {
         className="w-full h-52 object-cover"
       />
       <div className="p-4">
-        <h3 className="font-semibold text-lg">{property.name || "Unnamed Property"}</h3>
+        <h3 className="font-semibold text-lg">
+          {property.name || "Unnamed Property"}
+        </h3>
         <p className="text-sm text-gray-600">
           ${property.price?.toLocaleString() || "N/A"} / night
         </p>
